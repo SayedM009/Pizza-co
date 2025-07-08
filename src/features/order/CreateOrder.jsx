@@ -1,4 +1,8 @@
 import { useState } from "react";
+import { createOrder } from "../../services/apiRestaurant";
+import { redirect, useActionData, useNavigation } from "react-router";
+import { Form } from "react-router-dom";
+import { FiAlertCircle } from "react-icons/fi";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
@@ -30,24 +34,48 @@ const fakeCart = [
   },
 ];
 
+const errorStyle = {
+  fontSize: "12px",
+  color: "red",
+  display: "flex",
+  alignItems: "center",
+  gap: ".5rem",
+};
+
 function CreateOrder() {
   // const [withPriority, setWithPriority] = useState(false);
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
+  const formErrors = useActionData();
+
   const cart = fakeCart;
 
   return (
     <div>
       <h2>Ready to order? Let's go!</h2>
 
-      <form>
+      <Form method="POST">
         <div>
           <label>First Name</label>
           <input type="text" name="customer" required />
+          {formErrors?.customer && (
+            <div style={errorStyle}>
+              <FiAlertCircle />
+              {formErrors.customer}
+            </div>
+          )}
         </div>
 
         <div>
           <label>Phone number</label>
           <div>
             <input type="tel" name="phone" required />
+            {formErrors?.phone && (
+              <div style={errorStyle}>
+                <FiAlertCircle />
+                {formErrors.phone}
+              </div>
+            )}
           </div>
         </div>
 
@@ -55,6 +83,12 @@ function CreateOrder() {
           <label>Address</label>
           <div>
             <input type="text" name="address" required />
+            {formErrors?.address && (
+              <div style={errorStyle}>
+                <FiAlertCircle />
+                {formErrors.address}
+              </div>
+            )}
           </div>
         </div>
 
@@ -70,11 +104,51 @@ function CreateOrder() {
         </div>
 
         <div>
-          <button>Order now</button>
+          <input
+            type="hidden"
+            name="cart"
+            id="cart"
+            value={JSON.stringify(cart)}
+          />
+          <label htmlFor="priority">Want to yo give your order priority?</label>
         </div>
-      </form>
+
+        <div>
+          <button disabled={isSubmitting}>
+            {isSubmitting ? "loading" : "Order new"}
+          </button>
+        </div>
+      </Form>
     </div>
   );
+}
+
+export async function action({ request }) {
+  const formData = await request.formData();
+  const data = Object.fromEntries(formData);
+
+  const order = {
+    ...data,
+    cart: JSON.parse(data.cart),
+    priority: data.priority === "on",
+  };
+
+  const errors = {};
+
+  if (order.customer.length <= 2)
+    errors.customer = "You name should be larger than 2 chracters";
+
+  if (!isValidPhone(order.phone))
+    errors.phone = "Please enter a valid phone number";
+
+  if (order.address.length <= 4)
+    errors.address = "You address should be larger than 5 chracters";
+
+  if (Object.keys(errors).length > 0) return errors;
+
+  const newOrder = await createOrder(order);
+
+  return redirect(`/order/${newOrder.id}`);
 }
 
 export default CreateOrder;
