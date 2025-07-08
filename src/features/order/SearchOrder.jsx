@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 function SearchOrder() {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const navigate = useNavigate();
 
   function onHandleSubmit(e) {
@@ -11,9 +11,9 @@ function SearchOrder() {
     if (!query) return;
 
     navigate(`/order/${query}`, {
-      state: { test: JSON.stringify({ name: "sayed", age: 25 }) },
+      state: { test: JSON.stringify({ name: 'sayed', age: 25 }) },
     });
-    setQuery("");
+    setQuery('');
   }
 
   return (
@@ -23,6 +23,7 @@ function SearchOrder() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Order ID"
+        className="rounded bg-white py-1 ps-2 outline-0 transition-all duration-300 placeholder:font-normal focus:translate-y-[-3px] focus:shadow-lg"
       />
     </form>
   );
