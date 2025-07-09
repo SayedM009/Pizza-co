@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { Outlet, useNavigate, useNavigation } from 'react-router';
+import { Outlet, useNavigation } from 'react-router';
 import CartOverview from '../features/cart/CartOverview';
 import Header from './Header';
 import LoadingPage from './LoadingPage';

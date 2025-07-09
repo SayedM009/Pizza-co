@@ -9,8 +9,12 @@
   }
 }
 
+@theme {
+  --font-roboto: roboto, sans-serif;
+}
+
 body {
-  font-family:
+  /* font-family:
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
@@ -21,7 +25,9 @@ body {
     Cantarell,
     'Open Sans',
     'Helvetica Neue',
-    sans-serif;
+    sans-serif; */
+  /* @apply font-sans; */
+  font-family: 'Roboto Mono';
   background-color: #f7f7f7;
   color: #444;
 }

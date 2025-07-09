@@ -3,6 +3,7 @@ import { createOrder } from '../../services/apiRestaurant';
 import { redirect, useActionData, useNavigation } from 'react-router';
 import { Form } from 'react-router-dom';
 import { FiAlertCircle } from 'react-icons/fi';
+import { useSelector } from 'react-redux';
 import Button from '../../ui/Button';
 
 // https://uibakery.io/regex-library/phone-number
@@ -48,7 +49,7 @@ function CreateOrder() {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === 'submitting';
   const formErrors = useActionData();
-
+  const userName = useSelector((state) => state.user.username);
   const cart = fakeCart;
 
   return (
@@ -56,9 +57,15 @@ function CreateOrder() {
       <h2 className="my-5 text-3xl font-semibold">Ready to order? Let's go!</h2>
 
       <Form method="POST">
-        <div>
-          <label>First Name</label>
-          <input type="text" name="customer" required className="bg-white" />
+        <div className="mb-2 flex items-center justify-between">
+          <label className="w-74">First Name</label>
+          <input
+            type="text"
+            name="customer"
+            defaultValue={userName}
+            required
+            className="w-full bg-white ps-2 uppercase"
+          />
           {formErrors?.customer && (
             <div className="errorMessage">
               <FiAlertCircle />
@@ -67,10 +74,15 @@ function CreateOrder() {
           )}
         </div>
 
-        <div>
-          <label>Phone number</label>
-          <div>
-            <input type="tel" name="phone" required className="bg-white" />
+        <div className="mb-2 flex items-center justify-between">
+          <label className="w-74">Phone number</label>
+          <div className="w-full">
+            <input
+              type="tel"
+              name="phone"
+              required
+              className="w-full bg-white"
+            />
             {formErrors?.phone && (
               <div className="errorMessage">
                 <FiAlertCircle />
@@ -80,10 +92,15 @@ function CreateOrder() {
           </div>
         </div>
 
-        <div>
-          <label>Address</label>
-          <div>
-            <input type="text" name="address" required className="bg-white" />
+        <div className="flex items-center justify-between">
+          <label className="w-74">Address</label>
+          <div className="w-full">
+            <input
+              type="text"
+              name="address"
+              required
+              className="w-full bg-white"
+            />
             {formErrors?.address && (
               <div className="errorMessage">
                 <FiAlertCircle />
@@ -102,7 +119,7 @@ function CreateOrder() {
             // value={withPriority}
             // onChange={(e) => setWithPriority(e.target.checked)}
           />
-          <label htmlFor="priority" className="select-none">
+          <label htmlFor="priority" className="my-3 select-none">
             Want to yo give your order priority?
           </label>
         </div>

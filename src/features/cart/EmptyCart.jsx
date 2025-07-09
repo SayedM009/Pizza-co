@@ -5,7 +5,9 @@ function EmptyCart() {
     <div>
       <Link to="/menu">&larr; Back to menu</Link>
 
-      <p>Your cart is still empty. Start adding some pizzas :)</p>
+      <p className="mt-5 bg-stone-300 p-3 font-semibold">
+        Your cart is still empty. Start adding some pizzas :)
+      </p>
     </div>
   );
 }
