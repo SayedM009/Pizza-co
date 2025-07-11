@@ -5,36 +5,14 @@ import { Form } from 'react-router-dom';
 import { FiAlertCircle } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 import Button from '../../ui/Button';
-
+import { clearCart, getCart } from '../cart/cartSlice';
+import EmptyCart from '../cart/EmptyCart';
+import store from '../../store';
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
   /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/.test(
     str,
   );
-
-const fakeCart = [
-  {
-    pizzaId: 12,
-    name: 'Mediterranean',
-    quantity: 2,
-    unitPrice: 16,
-    totalPrice: 32,
-  },
-  {
-    pizzaId: 6,
-    name: 'Vegetale',
-    quantity: 1,
-    unitPrice: 13,
-    totalPrice: 13,
-  },
-  {
-    pizzaId: 11,
-    name: 'Spinach and Mushroom',
-    quantity: 1,
-    unitPrice: 15,
-    totalPrice: 15,
-  },
-];
 
 const errorStyle = {
   fontSize: '12px',
@@ -50,7 +28,9 @@ function CreateOrder() {
   const isSubmitting = navigation.state === 'submitting';
   const formErrors = useActionData();
   const userName = useSelector((state) => state.user.username);
-  const cart = fakeCart;
+  const cart = useSelector(getCart);
+
+  if (!cart.length) return <EmptyCart />;
 
   return (
     <div>
@@ -168,6 +148,7 @@ export async function action({ request }) {
 
   const newOrder = await createOrder(order);
 
+  store.dispatch(clearCart());
   return redirect(`/order/${newOrder.id}`);
 }
 
