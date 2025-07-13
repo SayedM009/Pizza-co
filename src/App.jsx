@@ -1,42 +1,44 @@
-import { lazy } from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { lazy } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-const AppLayout = lazy(() => import("./ui/AppLayout"));
-const Home = lazy(() => import("./ui/Home"));
-const Menu = lazy(() => import("./features/menu/Menu"));
-const Cart = lazy(() => import("./features/cart/Cart"));
-const CreateOrder = lazy(() => import("./features/order/CreateOrder"));
-const Order = lazy(() => import("./features/order/Order"));
-const Error = lazy(() => import("./ui/Error"));
+const AppLayout = lazy(() => import('./ui/AppLayout'));
+const Home = lazy(() => import('./ui/Home'));
+const Menu = lazy(() => import('./features/menu/Menu'));
+const Cart = lazy(() => import('./features/cart/Cart'));
+const CreateOrder = lazy(() => import('./features/order/CreateOrder'));
+const Order = lazy(() => import('./features/order/Order'));
+const Error = lazy(() => import('./ui/Error'));
 
-import { loader as menuLoader } from "./features/menu/Menu";
-import { loader as orderLoader } from "./features/order/Order";
-import { action as createOrderAction } from "./features/order/CreateOrder";
+import { loader as menuLoader } from './features/menu/Menu';
+import { loader as orderLoader } from './features/order/Order';
+import { action as createOrderAction } from './features/order/CreateOrder';
+import { action as updateOrder } from './features/order/UpdateOrder';
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <AppLayout />,
     errorElement: <Error />,
     children: [
       { index: true, element: <Home /> },
       {
-        path: "menu",
+        path: 'menu',
         element: <Menu />,
         loader: menuLoader,
         errorElement: <Error />,
       },
-      { path: "cart", element: <Cart /> },
+      { path: 'cart', element: <Cart /> },
       {
-        path: "order/new",
+        path: 'order/new',
         element: <CreateOrder />,
         action: createOrderAction,
       },
       {
-        path: "order/:orderId",
+        path: 'order/:orderId',
         element: <Order />,
         loader: orderLoader,
         errorElement: <Error />,
+        action: updateOrder,
       },
     ],
   },

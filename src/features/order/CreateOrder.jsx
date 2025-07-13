@@ -3,11 +3,12 @@ import { createOrder } from '../../services/apiRestaurant';
 import { redirect, useActionData, useNavigation } from 'react-router';
 import { Form } from 'react-router-dom';
 import { FiAlertCircle } from 'react-icons/fi';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../ui/Button';
 import { clearCart, getCart } from '../cart/cartSlice';
 import EmptyCart from '../cart/EmptyCart';
 import store from '../../store';
+import { fetchAddress } from '../user/userSlice';
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
   /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/.test(
@@ -27,8 +28,16 @@ function CreateOrder() {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === 'submitting';
   const formErrors = useActionData();
-  const userName = useSelector((state) => state.user.username);
+  const {
+    username,
+    status: addressStatus,
+    address,
+    position,
+    error,
+  } = useSelector((state) => state.user);
   const cart = useSelector(getCart);
+  const disptach = useDispatch();
+  const isFetingAddress = addressStatus === 'loading';
 
   if (!cart.length) return <EmptyCart />;
 
@@ -39,19 +48,21 @@ function CreateOrder() {
       <Form method="POST">
         <div className="mb-2 flex items-center justify-between">
           <label className="w-74">First Name</label>
-          <input
-            type="text"
-            name="customer"
-            defaultValue={userName}
-            required
-            className="w-full bg-white ps-2 uppercase"
-          />
-          {formErrors?.customer && (
-            <div className="errorMessage">
-              <FiAlertCircle />
-              {formErrors.customer}
-            </div>
-          )}
+          <div className="w-full">
+            <input
+              type="text"
+              name="customer"
+              defaultValue={username}
+              required
+              className="w-full rounded-full bg-white p-3 ps-2 uppercase"
+            />
+            {formErrors?.customer && (
+              <div className="errorMessage">
+                <FiAlertCircle />
+                {formErrors.customer}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="mb-2 flex items-center justify-between">
@@ -61,7 +72,7 @@ function CreateOrder() {
               type="tel"
               name="phone"
               required
-              className="w-full bg-white"
+              className="w-full rounded-full bg-white p-3"
             />
             {formErrors?.phone && (
               <div className="errorMessage">
@@ -72,20 +83,35 @@ function CreateOrder() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="relative flex items-center justify-between">
           <label className="w-74">Address</label>
           <div className="w-full">
             <input
               type="text"
               name="address"
               required
-              className="w-full bg-white"
+              className="w-full rounded-full bg-white p-3"
+              defaultValue={address && address}
             />
             {formErrors?.address && (
               <div className="errorMessage">
                 <FiAlertCircle />
                 {formErrors.address}
               </div>
+            )}
+            {!address && (
+              <span className="absolute top-[2px] right-[2px]">
+                <Button
+                  type="small"
+                  disabled={isFetingAddress}
+                  handleClick={(e) => {
+                    e.preventDefault();
+                    disptach(fetchAddress());
+                  }}
+                >
+                  Get Position
+                </Button>
+              </span>
             )}
           </div>
         </div>
@@ -114,6 +140,22 @@ function CreateOrder() {
         </div>
 
         <div>
+          <input
+            type="hidden"
+            name="address"
+            id="cart"
+            value={
+              position
+                ? JSON.stringify({
+                    position: [position.latitude, position.longitude],
+                    address: address,
+                  })
+                : {}
+            }
+          />
+        </div>
+
+        <div>
           <Button disabled={isSubmitting}>
             {isSubmitting ? 'loading' : 'Order new'}
           </Button>
@@ -126,11 +168,12 @@ function CreateOrder() {
 export async function action({ request }) {
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
-
   const order = {
     ...data,
     cart: JSON.parse(data.cart),
     priority: data.priority === 'on',
+    address: JSON.parse(data.address).address,
+    position: `${JSON.parse(data.address).position}`,
   };
 
   const errors = {};

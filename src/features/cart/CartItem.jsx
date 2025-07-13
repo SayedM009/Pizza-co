@@ -6,7 +6,7 @@ function CartItem({ item, isDeleteBtn = true }) {
   const { pizzaId, name, quantity, totalPrice } = item;
 
   return (
-    <li className="py-3">
+    <li className="bg-white px-3 py-3">
       <p>
         {quantity}&times; {name}
       </p>

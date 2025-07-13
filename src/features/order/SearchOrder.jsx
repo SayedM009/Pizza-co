@@ -10,9 +10,7 @@ function SearchOrder() {
 
     if (!query) return;
 
-    navigate(`/order/${query}`, {
-      state: { test: JSON.stringify({ name: 'sayed', age: 25 }) },
-    });
+    navigate(`/order/${query}`);
     setQuery('');
   }
 

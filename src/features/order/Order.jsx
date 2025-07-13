@@ -8,6 +8,9 @@ import {
   formatDate,
 } from '../../utils/helpers';
 import CartItem from '../cart/CartItem';
+import { useFetcher } from 'react-router-dom';
+import { useEffect } from 'react';
+import UpdateOrder from './UpdateOrder';
 
 export async function loader({ params }) {
   const order = await getOrder(params.orderId);
@@ -27,6 +30,13 @@ function Order() {
     cart,
   } = order;
   const deliveryIn = calcMinutesLeft(estimatedDelivery);
+  const x = 10;
+
+  const fetcher = useFetcher();
+
+  useEffect(() => {
+    if (!fetcher.data) fetcher.load('/menu');
+  }, []);
 
   return (
     <div>
@@ -58,9 +68,20 @@ function Order() {
         {cart.map((item, index) => {
           return (
             <li className="flex items-center justify-between py-3">
-              <p>
-                {item.quantity}&times; {item.name}
-              </p>
+              <div>
+                <p>
+                  {item.quantity}&times; {item.name}
+                </p>
+                <p className="mt-2 text-[12px] font-light uppercase italic">
+                  {fetcher.state === 'loading' ? (
+                    <div>loading...</div>
+                  ) : (
+                    fetcher?.data
+                      ?.filter((pizza) => pizza.name == item.name)[0]
+                      .ingredients.join(', ')
+                  )}
+                </p>
+              </div>
               <div className="flex items-center justify-between">
                 <p className="font-semibold">
                   {formatCurrency(item.totalPrice)}
@@ -76,6 +97,7 @@ function Order() {
         {priority && <p>Price priority: {formatCurrency(priorityPrice)}</p>}
         <p>To pay on delivery: {formatCurrency(orderPrice + priorityPrice)}</p>
       </div>
+      {!priority && <UpdateOrder />}
     </div>
   );
 }

@@ -22,7 +22,7 @@ function MenuItem({ pizza }) {
   }
 
   return (
-    <li className="mb-2 flex gap-2 py-3">
+    <li className={`mb-2 flex gap-2 p-3 ${!soldOut && 'bg-white'}`}>
       <img
         src={imageUrl}
         alt={name}

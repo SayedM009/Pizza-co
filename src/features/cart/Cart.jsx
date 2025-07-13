@@ -31,7 +31,9 @@ function Cart() {
 
       <div className="flex gap-5">
         <Button to="/order/new">Order pizzas</Button>
-        <Button handleClick={handleClearCart}>Clear cart</Button>
+        <Button handleClick={handleClearCart} type="secondary">
+          Clear cart
+        </Button>
       </div>
     </div>
   );
